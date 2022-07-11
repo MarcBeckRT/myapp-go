@@ -8,7 +8,6 @@ const (
 )
 
 type User struct {
-	UserID uint
-	Name   string `gorm:"notNull;size:40"`
-	Role   Role   `gorm:"notNull;type:ENUM('TRAINER','PLAYER')"`
+	Name string `gorm:"notNull;size:40"`
+	Role Role   `gorm:"notNull;type:ENUM('TRAINER','PLAYER')"`
 }
