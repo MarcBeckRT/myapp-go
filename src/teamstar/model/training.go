@@ -7,4 +7,5 @@ type Training struct {
 	Topic     string     `gorm:"notNull;size:40"`
 	Date      string     `gorm:"notNull;size:40"`
 	Feedbacks []Feedback `gorm:"foreignKey:TrainingID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User      User       `gorm:"embedded;embeddedPrefix:user_"`
 }

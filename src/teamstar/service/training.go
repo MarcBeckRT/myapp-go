@@ -11,13 +11,18 @@ import (
 )
 
 func CreateTraining(training *model.Training) error {
-	result := db.DB.Create(training)
-	if result.Error != nil {
-		return result.Error
+	if training.User.Role != "TRAINER" {
+		log.Error("Only a trainer can create a training")
+		return nil
+	} else {
+		result := db.DB.Create(training)
+		if result.Error != nil {
+			return result.Error
+		}
+		log.Infof("Successfully stored new training with ID %v in database.", training.ID)
+		log.Tracef("Stored: %v", training)
+		return nil
 	}
-	log.Infof("Successfully stored new training with ID %v in database.", training.ID)
-	log.Tracef("Stored: %v", training)
-	return nil
 }
 
 func GetTraining(id uint) (*model.Training, error) {
