@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -11,6 +13,7 @@ import (
 	"github.com/MarcBeckRT/myapp-go/src/teamstar/authorization"
 	"github.com/MarcBeckRT/myapp-go/src/teamstar/db"
 	"github.com/MarcBeckRT/myapp-go/src/teamstar/handler"
+	"github.com/MarcBeckRT/myapp-go/src/teamstar/model"
 	"github.com/MarcBeckRT/myapp-go/src/teamstar/service"
 
 	"github.com/alexedwards/scs/v2"
@@ -71,19 +74,35 @@ func main() {
 	//	log.Fatal(err)
 	//}
 	http.ListenAndServe(":8080", sessionManager.LoadAndSave(router))
-	log.Fatal(http.ListenAndServe(":8080", authorization.Authorizer(authEnforcer, service.GetUsers())(router)))
+	userField := &model.User{}
+	http.ListenAndServe(":8080", authorization.Authorizer(authEnforcer, userField)(router))
+}
 
+type myInfo struct {
+	ID int `json:"id"`
+	//Name string `json:"name"`
+	//Role string `json:"role"`
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
+	var info myInfo
 	r.ParseForm()
-	idstring := r.FormValue("ID")
-	id, err := strconv.Atoi(idstring)
-	if err != nil { // ... handle error
-		panic(err)
-	}
-	userID := id
+	//idstring := r.FormValue("ID")
+	data, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
+	json.Unmarshal(data, &info)
+	fmt.Println(string(data))
+	fmt.Println(info)
+
+	//fmt.Printf("ID => %s ", r.Form.Get("ID"))
+	//fmt.Printf("hallo")
+	//id, err := strconv.Atoi(idstring)
+	//if err != nil { // ... handle error
+	//	panic(err)
+	//}
+	userID := info.ID
 
 	// First renew the session token...
 	err2 := sessionManager.RenewToken(r.Context())
