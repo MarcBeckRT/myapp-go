@@ -13,7 +13,7 @@ import (
 )
 
 // Authorizer is a middleware for authorization
-func Authorizer(e *casbin.Enforcer, users model.Users) func(next http.Handler) http.Handler {
+func Authorizer(e *casbin.Enforcer, users []model.User) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		var sessionManager = scs.New()
 		fn := func(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -34,16 +34,22 @@ func CreateUser(user *model.User) error {
 	return nil
 }
 
-func GetUserID(name string) (int, error) {
-	var userID int
-	user, err := FindByName(name)
-	if err != nil {
-		return 0, err //noch überarbeiten
-		//log nachricht
+func GetUser(uid int) (*model.User, error) {
+	user := users[uid]
+	if user == nil {
+		return nil, fmt.Errorf("no user with ID %d", uid)
 	}
-	userID = user.ID
+	log.Tracef("Retrieved: %v", user)
+	return user, nil
+}
 
-	return userID, nil
+func GetUsers() []model.User {
+	var userlist []model.User
+	for _, user := range users {
+		userlist = append(userlist, *user)
+	}
+	log.Tracef("Retrieved: %v", userlist)
+	return userlist
 }
 
 func Exists(id int) bool {
@@ -54,13 +60,4 @@ func Exists(id int) bool {
 		}
 	}
 	return exists
-}
-
-func FindByName(name string) (*model.User, error) {
-	for _, user := range users {
-		if user.Name == name {
-			return user, nil
-		}
-	}
-	return nil, errors.New("USER_NOT_FOUND")
 }

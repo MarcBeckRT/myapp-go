@@ -24,6 +24,16 @@ func getId(r *http.Request) (uint, error) {
 	return uint(id), nil
 }
 
+func getUId(r *http.Request) (int, error) {
+	vars := mux.Vars(r)
+	uid, err := strconv.ParseUint(vars["uid"], 10, 0)
+	if err != nil {
+		log.Errorf("Can't get ID from request: %v", err)
+		return 0, err
+	}
+	return int(uid), nil
+}
+
 func sendJson(w http.ResponseWriter, value interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(value); err != nil {
