@@ -23,7 +23,7 @@ func CreateAdmin() {
 		Name: "admin",
 		Role: "trainer",
 	}
-	log.Info("created Admin with name=admin and Id=1")
+	log.Info("created Admin with name:admin and Id:1")
 }
 
 func CreateUser(user *model.User) error {

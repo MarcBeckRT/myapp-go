@@ -66,16 +66,18 @@ func main() {
 	router.HandleFunc("/userlist", handler.GetUsers).Methods("GET")
 	router.HandleFunc("/trainer/training", handler.CreateTraining).Methods("POST")
 	router.HandleFunc("/trainer/users", handler.CreateUser).Methods("POST")
+	router.HandleFunc("/trainer/trainings/{id}", handler.DeleteTraining).Methods("DELETE")
 	router.HandleFunc("/player/trainings", handler.GetTrainings).Methods("GET")
 	router.HandleFunc("/player/trainings/{id}", handler.GetTraining).Methods("GET")
-	router.HandleFunc("/player/trainings/{id}", handler.DeleteTraining).Methods("DELETE")
 	router.HandleFunc("/player/trainings/{id}/feedback", handler.AddFeedback).Methods("POST")
-	//if err := http.ListenAndServe(":8080", router); err != nil {
-	//	log.Fatal(err)
-	//}
+
 	http.ListenAndServe(":8080", sessionManager.LoadAndSave(router))
 	userField := &model.User{}
 	http.ListenAndServe(":8080", authorization.Authorizer(authEnforcer, userField)(router))
+
+	if err := http.ListenAndServe(":8080", router); err != nil {
+		log.Fatal(err)
+	}
 }
 
 type myInfo struct {
@@ -86,6 +88,7 @@ type myInfo struct {
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
+	//get user Id from http.Request
 	var info myInfo
 	r.ParseForm()
 	//idstring := r.FormValue("ID")
@@ -93,52 +96,22 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	json.Unmarshal(data, &info)
-	fmt.Println(string(data))
-	fmt.Println(info)
+	//fmt.Println(string(data))
+	fmt.Println(info) // just for checking
 
-	//fmt.Printf("ID => %s ", r.Form.Get("ID"))
-	//fmt.Printf("hallo")
-	//id, err := strconv.Atoi(idstring)
-	//if err != nil { // ... handle error
-	//	panic(err)
-	//}
 	userID := info.ID
 
-	// First renew the session token...
-	err2 := sessionManager.RenewToken(r.Context())
-	if err2 != nil {
-		http.Error(w, err2.Error(), 500)
+	// First renew the session token
+	err := sessionManager.RenewToken(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
 	// Then make the privilege-level change.
 	sessionManager.Put(r.Context(), "userID", userID)
+	log.Infof("Successfully loged in user with Id: %d", userID)
 }
-
-//func loginHandler(users []model.User) http.HandlerFunc {
-//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		if err := sessionManager.RenewToken(r.Context()); err != nil {
-//			log.Errorf("500 ERROR", w, err)
-//			return
-//		}
-//		idstring := r.PostFormValue("id")
-//		id, err := strconv.Atoi(idstring)
-//		if err != nil {
-//			// ... handle error
-//			panic(err)
-//		}
-//		user, err := service.GetUser(id)
-//		if err != nil {
-//			log.Errorf("400 WRONG_CREDENTIALS", w, err)
-//			return
-//		}
-//		// setup session
-//
-//		sessionManager.Put(r.Context(), "userID", user.ID)
-//		sessionManager.Put(r.Context(), "role", user.Role)
-//		log.Info("Successfull login", w)
-//	})
-//}
 
 //func logoutHandler() http.HandlerFunc {
 //	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -148,15 +121,4 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 //		}
 //		log.Info("Successfull logout", w)
 //	})
-//}
-
-//func createAdmin() model.Users {
-//	users := model.Users{}
-//	users[1] = &model.User{
-//		ID:   1,
-//		Name: "admin",
-//		Role: "trainer",
-//	}
-//	log.Info("created Admin with name=admin and Id=1")
-//	return users
 //}

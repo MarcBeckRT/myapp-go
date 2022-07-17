@@ -51,10 +51,5 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUsers(w http.ResponseWriter, _ *http.Request) {
 	users := service.GetUsers()
-	//if err != nil {
-	//	log.Errorf("Error calling service GetUsers: %v", err)
-	//	http.Error(w, err.Error(), http.StatusBadRequest)
-	//	return
-	//}
 	sendJson(w, users)
 }
