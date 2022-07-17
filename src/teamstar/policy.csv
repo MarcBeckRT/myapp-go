@@ -1,0 +1,4 @@
+p, trainer, /*, *
+p, anonymous, /login, *
+p, player, /logout, *
+p, player, /player/*, *
