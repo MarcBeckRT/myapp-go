@@ -26,12 +26,18 @@ curl localhost:8080/userlist
 
 login player (oben erstellt):
 
-curl -H "Content-Type: application/json" -d '{"id":2,"name":"marc","role":"player"}' localhost:8080/login
+curl -H "Content-Type: application/json" -d '{"id":1,"name":"admin","role":"trainer"}' localhost:8080/login
 
 
 create training (als trainer):
 
-curl -H "Content-Type: application/json" -d '{"topic":"Regeneration","content":"entspannter Lauf und Fußballtennis. Laufschuhe mitbringen!","date":"10.07.2022","user":{"name":"admin","role":"trainer"}}' localhost:8080/trainer/training 
+curl -H "Content-Type: application/json" -d '{"topic":"Regeneration","content":"entspannter Lauf und Fußballtennis. Laufschuhe mitbringen!","date":"10.07.2022","user":{"name":"admin","role":"trainer","id":1}}' localhost:8080/trainer/training 
+
+
+create user (als trainer):
+
+curl -H "Content-Type: application/json" -d '{"name":"marc","role":"player"}' localhost:8080/trainer/users
+
 
 
 Liste aller Trainings:
